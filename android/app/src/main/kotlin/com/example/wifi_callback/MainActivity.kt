@@ -32,12 +32,14 @@ import android.provider.Settings.ADD_WIFI_RESULT_ALREADY_EXISTS
 
 class MainActivity: FlutterActivity() {
   private val CHANNEL = "samples.flutter.dev/battery"
+  //private var giveCallback = 0
+  protected lateinit var myResult : MethodChannel.Result
 
   override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
       // Note: this method is invoked on the main thread.
-      call, result ->
+      call, result -> myResult = result
 
       if (call.method == "connect") {
         val ssid = call.argument<String>("ssid")
@@ -74,24 +76,24 @@ class MainActivity: FlutterActivity() {
                 for (code in data.getIntegerArrayListExtra(EXTRA_WIFI_NETWORK_RESULT_LIST).orEmpty()) {
                     if(code == ADD_WIFI_RESULT_SUCCESS) {
                         Toast.makeText(this, "WIFI CONNECTED SUCCESSFULLY", Toast.LENGTH_SHORT).show()
-                        //giveCallback =  true
+                        myResult.success(true)
                     }
                      else if(code == ADD_WIFI_RESULT_ADD_OR_UPDATE_FAILED) {
                         Toast.makeText(this, "FAILED TO CONNECT", Toast.LENGTH_SHORT).show()
-                        //giveCallback = false
+                        myResult.success(false)
                     } else if(code == ADD_WIFI_RESULT_ALREADY_EXISTS) {
-                        Toast.makeText(this, "WIFFI ALREADY SAVED", Toast.LENGTH_SHORT).show()
-                        //giveCallback =  false
+                        Toast.makeText(this, "WIFFI ALREADY SAVED, TURN ON TO AUTO CONNECT", Toast.LENGTH_SHORT).show()
+                        myResult.success(false)
                     }else {
                         Toast.makeText(this, "SOME ERROR OCCURED", Toast.LENGTH_SHORT).show()
-                        //giveCallback =  false
+                        myResult.success(false)
                     }
                 }
             }
         } else {
             // User refused to save configurations
             Toast.makeText(this, "SOME ERROR OCCURED, USER REFUSED TO SAVEs", Toast.LENGTH_SHORT).show()
-            //giveCallback =  false
+            myResult.success(false)
         }
   }
 

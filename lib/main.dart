@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:logger/logger.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,8 +38,10 @@ class _BatteryWidgetState extends State<BatteryWidget> {
 
   Future<void> connectToWiFi(String ssid, String password) async {
     try {
-      await platform
+      var callback = await platform
           .invokeMethod('connect', {"ssid": ssid, "password": password});
+      var logger = Logger();
+      logger.d(callback);
     } on PlatformException catch (e) {}
   }
 
